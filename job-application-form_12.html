@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Application Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0F2A43;
+    --cream:#F4F6F8;
+    --brass:#2E6FA3;
+    --slate:#5A6B7B;
+    --green:#2E7D52;
+    --red:#B23B3B;
+    --line:#D8DEE5;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    font-family:'Inter',sans-serif;
+    color:var(--navy);
+    padding:40px 16px 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+
+  /* Header / stamp */
+  .letterhead{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:2px solid var(--navy);
+    padding-bottom:18px;
+    margin-bottom:8px;
+  }
+  .industry-tag{
+    font-family:'Inter',sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-bottom:6px;
+  }
+  .letterhead h1{
+    font-family:'Inter',sans-serif;
+    font-weight:800;
+    font-size:30px;
+    margin:0;
+    letter-spacing:-0.5px;
+    color:var(--navy);
+  }
+  .letterhead p{
+    margin:4px 0 0;
+    color:var(--slate);
+    font-size:14px;
+  }
+  .stamp{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--slate);
+    border:1.5px solid var(--line);
+    background:var(--cream);
+    padding:6px 12px;
+    text-align:center;
+    white-space:nowrap;
+    border-radius:2px;
+  }
+  .stamp span{display:block;color:var(--navy);font-size:13px;font-weight:700;letter-spacing:1px;}
+
+  form{margin-top:32px;}
+
+  .section{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:2px;
+    margin-bottom:24px;
+    overflow:hidden;
+    display:none;
+  }
+  .section.active{display:block;}
+  .progress{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:24px;
+    counter-reset:step;
+  }
+  .progress-step{
+    flex:1;
+    text-align:center;
+    position:relative;
+    font-family:'Inter',sans-serif;
+  }
+  .progress-step:not(:last-child)::after{
+    content:'';
+    position:absolute;
+    top:14px; left:50%;
+    width:100%; height:2px;
+    background:var(--line);
+    z-index:0;
+  }
+  .progress-step.done:not(:last-child)::after{background:var(--navy);}
+  .progress-dot{
+    width:28px;height:28px;
+    border-radius:50%;
+    background:#fff;
+    border:2px solid var(--line);
+    color:var(--slate);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 6px;
+    font-size:13px;font-weight:700;
+    position:relative; z-index:1;
+  }
+  .progress-step.active .progress-dot{border-color:var(--navy);color:var(--navy);}
+  .progress-step.done .progress-dot{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .progress-label{font-size:11px;color:var(--slate);font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}
+  .progress-step.active .progress-label{color:var(--navy);}
+  .step-nav{
+    display:flex;
+    justify-content:space-between;
+    padding:16px 24px;
+    border-top:1px solid var(--line);
+    background:var(--cream);
+  }
+  .btn-back, .btn-next{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:11px 26px;
+    border-radius:3px;
+    cursor:pointer;
+    transition:background .15s;
+  }
+  .btn-next{background:var(--navy);color:#fff;border:none;}
+  .btn-next:hover{background:#0A1E33;}
+  .btn-back{background:transparent;color:var(--slate);border:1px solid var(--line);}
+  .btn-back:hover{background:#EDEFF2;}
+  .btn-back:invisible-placeholder{visibility:hidden;}
+  .section-head{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:16px 24px;
+    background:var(--navy);
+    color:var(--cream);
+  }
+  .section-head .num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    color:var(--brass);
+    border:1px solid var(--brass);
+    width:26px;height:26px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:50%;
+    flex-shrink:0;
+  }
+  .section-head h2{
+    font-family:'Inter',sans-serif;
+    font-size:17px;
+    font-weight:700;
+    margin:0;
+    letter-spacing:-0.2px;
+  }
+  .section-body{
+    padding:24px;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:18px 20px;
+  }
+  .section-body.single{grid-template-columns:1fr;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field.full{grid-column:1 / -1;}
+  label{
+    font-size:13px;
+    font-weight:600;
+    color:var(--navy);
+  }
+  label .opt{font-weight:400;color:var(--slate);font-size:12px;}
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  select{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    background:#FCFBF8;
+    color:var(--navy);
+    outline:none;
+    transition:border-color .15s;
+  }
+  input:focus, select:focus{
+    border-color:var(--brass);
+    background:#fff;
+  }
+  input.error, select.error{border-color:var(--red);}
+  .errmsg{font-size:12px;color:var(--red);min-height:14px;}
+
+  .hint{font-size:12px;color:var(--slate);margin-top:2px;}
+
+  /* CTC group styling */
+  .ctc-group{
+    border:1px dashed var(--line);
+    padding:14px 16px;
+    border-radius:2px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    background:#FCFBF8;
+  }
+  .ctc-group .field.full{grid-column:1/-1;}
+  .ctc-total{
+    grid-column:1/-1;
+    font-size:13px;
+    color:var(--slate);
+    font-family:'IBM Plex Mono',monospace;
+    padding-top:4px;
+    border-top:1px solid var(--line);
+    margin-top:4px;
+  }
+  .ctc-total b{color:var(--navy);}
+
+  /* Upload */
+  .upload-box{
+    border:2px dashed var(--brass);
+    border-radius:2px;
+    padding:28px 20px;
+    text-align:center;
+    background:#FCFBF8;
+    cursor:pointer;
+    transition:background .15s, border-color .15s;
+    grid-column:1/-1;
+  }
+  .upload-box:hover, .upload-box.drag{
+    background:#F3ECDF;
+  }
+  .upload-box input{display:none;}
+  .upload-icon{
+    font-size:26px;
+    margin-bottom:6px;
+  }
+  .upload-title{font-weight:600;font-size:14px;}
+  .upload-sub{font-size:12px;color:var(--slate);margin-top:4px;}
+  .file-chip{
+    display:none;
+    margin-top:14px;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--navy);
+    color:var(--cream);
+    padding:10px 14px;
+    border-radius:2px;
+    font-size:13px;
+    text-align:left;
+  }
+  .file-chip.show{display:flex;}
+  .file-chip .remove{
+    cursor:pointer;
+    color:var(--brass);
+    font-weight:700;
+    margin-left:12px;
+  }
+
+  /* Submit */
+  .submit-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-top:8px;
+  }
+  button[type="submit"]{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    background:var(--navy);
+    color:#fff;
+    border:none;
+    padding:14px 34px;
+    border-radius:3px;
+    cursor:pointer;
+    transition:background .15s;
+    letter-spacing:0.2px;
+  }
+  button[type="submit"]:hover{background:#0A1E33;}
+  .submit-note{font-size:12px;color:var(--slate);}
+
+  .success-banner{
+    display:none;
+    background:#EAF2ED;
+    border:1px solid var(--green);
+    color:var(--green);
+    padding:16px 20px;
+    border-radius:2px;
+    margin-bottom:24px;
+    font-size:14px;
+  }
+  .success-banner.show{display:block;}
+  .success-banner b{display:block;font-family:'Inter',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px;}
+
+  @media (max-width:640px){
+    .section-body, .ctc-group{grid-template-columns:1fr;}
+    .letterhead{flex-direction:column;align-items:flex-start;gap:12px;}
+    .progress-label{font-size:9px;}
+    .step-nav{flex-direction:column;gap:10px;}
+    .btn-back, .btn-next{width:100%;text-align:center;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="letterhead">
+    <div>
+      <div class="industry-tag">Furniture &amp; Interior · Fit-Out · Manufacturing Industry</div>
+      <h1>Job Application Form</h1>
+      <p>Please complete every field accurately. Fields marked * are required.</p>
+    </div>
+    <div class="stamp">FILE NO.<span id="refNo">Assigned on submit</span></div>
+  </div>
+
+  <div class="success-banner" id="successBanner">
+    <b>Application recorded — File No. <span id="successFileNo"></span></b>
+    Thank you — your details and CV have been saved. You can view uploaded resumes in the
+    <a id="driveFolderLink" href="https://drive.google.com/drive/folders/1vTO81JiR2d6QnaI1ncd9PU7RYFr3on8P?dmr=1&ec=wgc-drive-%5Bmodule%5D-goto" target="_blank" rel="noopener">shared Drive folder</a>.
+  </div>
+
+  <div class="progress" id="progressBar">
+    <div class="progress-step" data-step="1"><div class="progress-dot">1</div><div class="progress-label">Personal</div></div>
+    <div class="progress-step" data-step="2"><div class="progress-dot">2</div><div class="progress-label">Experience</div></div>
+    <div class="progress-step" data-step="3"><div class="progress-dot">3</div><div class="progress-label">Compensation</div></div>
+    <div class="progress-step" data-step="4"><div class="progress-dot">4</div><div class="progress-label">Documents</div></div>
+  </div>
+
+  <form id="appForm" novalidate>
+
+    <!-- 1. Personal Details -->
+    <div class="section" data-step="1">
+      <div class="section-head"><span class="num">1</span><h2>Personal Details</h2></div>
+      <div class="section-body">
+        <div class="field">
+          <label for="fullName">Full Name *</label>
+          <input type="text" id="fullName" name="fullName" required>
+          <div class="errmsg"></div>
+        </div>
+        <div class="field">
+          <label for="position">Position Applied For *</label>
+          <input type="text" id="position" name="position" required>
+          <div class="errmsg"></div>
+        </div>
+        <div class="field">
+          <label for="department">Department *</label>
+          <select id="department" name="department" required>
+            <option value="">Select</option>
+            <option value="HR & Admin">HR &amp; Admin</option>
+            <option value="Production / Manufacturing">Production / Manufacturing</option>
+            <option value="Quality Assurance">Quality Assurance</option>
+            <option value="Supply Chain / Logistics">Supply Chain / Logistics</option>
+            <option value="Finance & Accounts">Finance &amp; Accounts</option>
+            <option value="Sales & Marketing">Sales &amp; Marketing</option>
+            <option value="IT">IT</option>
+            <option value="Other">Other</option>
+          </select>
+          <div class="errmsg"></div>
+        </div>
+        <div class="field">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" required>
+          <div class="errmsg"></div>
+        </div>
+        <div class="field">
+          <label for="phone">Phone Number *</label>
+          <input type="tel" id="phone" name="phone" placeholder="+91 " required>
+          <div class="errmsg"></div>
+        </div>
+        <div class="field full">
+          <label for="location">Current Location *</label>
+          <input type="text" id="location" name="location" placeholder="City, State">
+          <div class="errmsg"></div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <span></span>
+        <button type="button" class="btn-next" data-next>Next: Experience &amp; Notice →</button>
+      </div>
+    </div>
+
+    <!-- 2. Experience & Notice -->
+    <div class="section" data-step="2">
+      <div class="section-head"><span class="num">2</span><h2>Experience &amp; Notice Period</h2></div>
+      <div class="section-body">
+        <div class="field">
+          <label for="totalExp">Total Years of Experience *</label>
+          <input type="number" id="totalExp" name="totalExp" min="0" step="0.1" placeholder="e.g. 3.5" required>
+          <div class="errmsg"></div>
+        </div>
+        <div class="field">
+          <label for="relevantExp">Relevant Experience <span class="opt">(optional)</span></label>
+          <input type="number" id="relevantExp" name="relevantExp" min="0" step="0.1" placeholder="e.g. 2.5">
+          <div class="errmsg"></div>
+        </div>
+        <div class="field">
+          <label for="lastCompany">Last Company <span class="opt">(optional)</span></label>
+          <input type="text" id="lastCompany" name="lastCompany">
+          <div class="errmsg"></div>
+        </div>
+        <div class="field">
+          <label for="noticePeriod">Notice Period *</label>
+          <select id="noticePeriod" name="noticePeriod" required>
+            <option value="">Select</option>
+            <option value="Immediate">Immediate Joiner</option>
+            <option value="15 Days">15 Days</option>
+            <option value="30 Days">30 Days</option>
+            <option value="45 Days">45 Days</option>
+            <option value="60 Days">60 Days</option>
+            <option value="90 Days">90 Days</option>
+            <option value="Other">Other (mention in remarks)</option>
+          </select>
+          <div class="errmsg"></div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button type="button" class="btn-back" data-back>← Back</button>
+        <button type="button" class="btn-next" data-next>Next: Compensation →</button>
+      </div>
+    </div>
+
+    <!-- 3. Compensation -->
+    <div class="section" data-step="3">
+      <div class="section-head"><span class="num">3</span><h2>Compensation Details</h2></div>
+      <div class="section-body single">
+
+        <div class="field full">
+          <label>Current CTC (Annual, in ₹) *</label>
+          <div class="ctc-group">
+            <div class="field">
+              <label for="curAccount">Account / Bank Component *</label>
+              <input type="number" id="curAccount" name="curAccount" min="0" placeholder="e.g. 400000" required>
+              <div class="errmsg"></div>
+            </div>
+            <div class="field">
+              <label for="curCash">Cash Component <span class="opt">(if any)</span></label>
+              <input type="number" id="curCash" name="curCash" min="0" placeholder="e.g. 50000">
+              <div class="errmsg"></div>
+            </div>
+            <div class="ctc-total">Total Current CTC: <b id="curTotal">₹ 0</b></div>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label>Expected CTC (Annual, in ₹) *</label>
+          <div class="ctc-group">
+            <div class="field">
+              <label for="expAccount">Account / Bank Component *</label>
+              <input type="number" id="expAccount" name="expAccount" min="0" placeholder="e.g. 480000" required>
+              <div class="errmsg"></div>
+            </div>
+            <div class="field">
+              <label for="expCash">Cash Component <span class="opt">(if any)</span></label>
+              <input type="number" id="expCash" name="expCash" min="0" placeholder="e.g. 60000">
+              <div class="errmsg"></div>
+            </div>
+            <div class="ctc-total">Total Expected CTC: <b id="expTotal">₹ 0</b></div>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label for="remarks">Remarks <span class="opt">(negotiation notes, notice details, etc.)</span></label>
+          <input type="text" id="remarks" name="remarks">
+        </div>
+      </div>
+      <div class="step-nav">
+        <button type="button" class="btn-back" data-back>← Back</button>
+        <button type="button" class="btn-next" data-next>Next: Documents →</button>
+      </div>
+    </div>
+
+    <!-- 4. Documents -->
+    <div class="section" data-step="4">
+      <div class="section-head"><span class="num">4</span><h2>Documents</h2></div>
+      <div class="section-body single">
+        <label style="margin-bottom:-6px;">Upload CV / Resume *</label>
+        <div class="upload-box" id="uploadBox">
+          <input type="file" id="cvFile" name="cvFile" accept=".pdf,.doc,.docx" required>
+          <div class="upload-icon">📄</div>
+          <div class="upload-title">Click to upload or drag your CV here</div>
+          <div class="upload-sub">PDF or Word document, up to 5 MB</div>
+          <div class="file-chip" id="fileChip">
+            <span id="fileName"></span>
+            <span class="remove" id="removeFile">Remove</span>
+          </div>
+        </div>
+        <div class="errmsg" id="cvError"></div>
+      </div>
+      <div class="step-nav">
+        <button type="button" class="btn-back" data-back>← Back</button>
+        <span></span>
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <button type="submit">Submit Application</button>
+      <span class="submit-note">This is a front-end form — connect it to your ATS or backend to receive live submissions.</span>
+    </div>
+  </form>
+</div>
+
+<script>
+  // ==== CONFIGURATION ====
+  // Paste the Web app URL you get after deploying Code.gs (Deploy > New deployment > Web app)
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz43IdkNlMquAnXVrgyAIPy8ppQTDYSxPk45kW2t4FwoFiSSIn79Pwy6H5JePPEZUsWvA/exec';
+
+  const form = document.getElementById('appForm');
+  const uploadBox = document.getElementById('uploadBox');
+  const cvFile = document.getElementById('cvFile');
+  const fileChip = document.getElementById('fileChip');
+  const fileName = document.getElementById('fileName');
+  const removeFile = document.getElementById('removeFile');
+  const cvError = document.getElementById('cvError');
+
+  // Upload interactions
+  uploadBox.addEventListener('click', (e) => {
+    if (e.target !== removeFile) cvFile.click();
+  });
+
+  cvFile.addEventListener('change', () => {
+    if (cvFile.files.length) {
+      const f = cvFile.files[0];
+      const sizeOk = f.size <= 5 * 1024 * 1024;
+      if (!sizeOk) {
+        cvError.textContent = 'File exceeds 5 MB. Please choose a smaller file.';
+        cvFile.value = '';
+        fileChip.classList.remove('show');
+        return;
+      }
+      cvError.textContent = '';
+      fileName.textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
+      fileChip.classList.add('show');
+    }
+  });
+
+  removeFile.addEventListener('click', (e) => {
+    e.stopPropagation();
+    cvFile.value = '';
+    fileChip.classList.remove('show');
+  });
+
+  ['dragover','dragenter'].forEach(evt=>{
+    uploadBox.addEventListener(evt, e=>{ e.preventDefault(); uploadBox.classList.add('drag'); });
+  });
+  ['dragleave','drop'].forEach(evt=>{
+    uploadBox.addEventListener(evt, e=>{ e.preventDefault(); uploadBox.classList.remove('drag'); });
+  });
+  uploadBox.addEventListener('drop', e=>{
+    if (e.dataTransfer.files.length) {
+      cvFile.files = e.dataTransfer.files;
+      cvFile.dispatchEvent(new Event('change'));
+    }
+  });
+
+  // Live CTC totals
+  function updateTotals(){
+    const curA = parseFloat(document.getElementById('curAccount').value) || 0;
+    const curC = parseFloat(document.getElementById('curCash').value) || 0;
+    const expA = parseFloat(document.getElementById('expAccount').value) || 0;
+    const expC = parseFloat(document.getElementById('expCash').value) || 0;
+    document.getElementById('curTotal').textContent = '₹ ' + (curA+curC).toLocaleString('en-IN');
+    document.getElementById('expTotal').textContent = '₹ ' + (expA+expC).toLocaleString('en-IN');
+  }
+  ['curAccount','curCash','expAccount','expCash'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', updateTotals);
+  });
+
+  // Multi-step wizard navigation
+  const steps = Array.from(document.querySelectorAll('.section[data-step]'));
+  const progressSteps = Array.from(document.querySelectorAll('.progress-step'));
+  let currentStep = 1;
+
+  const stepRequiredFields = {
+    1: ['fullName','position','department','email','phone','location'],
+    2: ['totalExp','noticePeriod'],
+    3: ['curAccount','expAccount'],
+    4: []
+  };
+
+  function showStep(n){
+    steps.forEach(s => s.classList.toggle('active', Number(s.dataset.step) === n));
+    progressSteps.forEach(p => {
+      const pStep = Number(p.dataset.step);
+      p.classList.toggle('active', pStep === n);
+      p.classList.toggle('done', pStep < n);
+    });
+    currentStep = n;
+    window.scrollTo({top: document.getElementById('progressBar').offsetTop - 20, behavior:'smooth'});
+  }
+
+  function validateStep(n){
+    let valid = true;
+    stepRequiredFields[n].forEach(id=>{
+      const el = document.getElementById(id);
+      if (!el.value.trim()){
+        setError(el, 'This field is required.');
+        valid = false;
+      } else {
+        setError(el, '');
+      }
+    });
+    if (n === 1){
+      const email = document.getElementById('email');
+      if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)){
+        setError(email, 'Enter a valid email address.');
+        valid = false;
+      }
+    }
+    if (!valid){
+      const firstError = steps[n-1].querySelector('.error');
+      if (firstError) firstError.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+    return valid;
+  }
+
+  document.querySelectorAll('[data-next]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if (validateStep(currentStep)) showStep(currentStep + 1);
+    });
+  });
+  document.querySelectorAll('[data-back]').forEach(btn=>{
+    btn.addEventListener('click', ()=> showStep(currentStep - 1));
+  });
+  progressSteps.forEach(p=>{
+    p.addEventListener('click', ()=>{
+      const target = Number(p.dataset.step);
+      if (target < currentStep) showStep(target);
+    });
+    p.style.cursor = 'pointer';
+  });
+
+  showStep(1);
+
+  // Validation + submit
+  function setError(input, msg){
+    input.classList.toggle('error', !!msg);
+    const errBox = input.parentElement.querySelector('.errmsg');
+    if (errBox) errBox.textContent = msg;
+  }
+
+  function fileToBase64(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]); // strip the data: prefix
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    let valid = true;
+
+    if (!cvFile.files.length){
+      cvError.textContent = 'Please upload your CV / resume.';
+      valid = false;
+    } else {
+      cvError.textContent = '';
+    }
+
+    if (!valid){
+      return;
+    }
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+
+    try {
+      const payload = {
+        fullName: document.getElementById('fullName').value,
+        position: document.getElementById('position').value,
+        department: document.getElementById('department').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        location: document.getElementById('location').value,
+        totalExp: document.getElementById('totalExp').value,
+        relevantExp: document.getElementById('relevantExp').value,
+        lastCompany: document.getElementById('lastCompany').value,
+        noticePeriod: document.getElementById('noticePeriod').value,
+        curAccount: document.getElementById('curAccount').value,
+        curCash: document.getElementById('curCash').value,
+        expAccount: document.getElementById('expAccount').value,
+        expCash: document.getElementById('expCash').value,
+        remarks: document.getElementById('remarks').value,
+        cvFile: null
+      };
+
+      if (cvFile.files.length){
+        const f = cvFile.files[0];
+        const base64 = await fileToBase64(f);
+        payload.cvFile = { name: f.name, mimeType: f.type || 'application/octet-stream', base64: base64 };
+      }
+
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids a CORS preflight to Apps Script
+        body: JSON.stringify(payload)
+      });
+      const result = await res.json();
+
+      if (result.result === 'success'){
+        document.getElementById('refNo').textContent = result.fileNo;
+        document.getElementById('successFileNo').textContent = result.fileNo;
+        document.getElementById('successBanner').classList.add('show');
+        form.style.display = 'none';
+        document.getElementById('progressBar').style.display = 'none';
+        window.scrollTo({top:0, behavior:'smooth'});
+      } else {
+        alert('Something went wrong submitting your application: ' + (result.message || 'Unknown error') + '. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
+    } catch (err){
+      alert('Could not reach the server. Please check your connection and try again.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }
+  });
+</script>
+</body>
+</html>
